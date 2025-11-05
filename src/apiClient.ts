@@ -17,24 +17,26 @@ export class CRUD {
     return body;
   }
 
+  private async fetchUser(id: string) {
+  const res = await this.request.get(`${BASE_URL}${API.USERS}/${id}`);
+  expect(res.ok()).toBeTruthy();
+  return await res.json();
+}
+
   async getUser(id: string) {
-    const getres = await this.request.get(`${BASE_URL}${API.USERS}/${id}`);
-    expect(getres.ok()).toBeTruthy();
-    const body = await getres.json();
+    const body = await this.fetchUser(id);
     console.log("📘 get:", body);
     return body;
   }
 
   async updateUser(id: string) {
-  const oldUser = await this.getUser(id);
-  const { _id, ...rest } = oldUser;
-
-  // 👇 generate random domain using faker
-  const updated = { ...rest, domain: faker.person.jobTitle() };
-  const updateres = await this.request.put(`${BASE_URL}${API.USERS}/${id}`, { data: updated });
-  expect(updateres.ok()).toBeTruthy();
-  console.log("🟡 Updated:", { _id, ...updated });
-}
+    const oldUser = await this.fetchUser(id); // no log here
+    const { _id, ...rest } = oldUser;
+    const updated = { ...rest, domain: faker.person.jobTitle() };
+    const updateres = await this.request.put(`${BASE_URL}${API.USERS}/${id}`, { data: updated });
+    expect(updateres.ok()).toBeTruthy();
+    console.log("🟡 Updated:", { _id, ...updated });
+  }
 
   async deleteUser(id: string) {
     const deleteres = await this.request.delete(`${BASE_URL}${API.USERS}/${id}`);

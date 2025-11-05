@@ -1,6 +1,6 @@
 // tests/schema.spec.ts
 import { test, expect } from "@playwright/test";
-import { validateSchema } from "../utils/validschema";
+import { validateSchema } from "../utils/validateschema";
 import { createUserSchema } from "../schema/createschema";
 import { updateUserSchema } from "../schema/updateschema";
 import { faker } from "@faker-js/faker";
