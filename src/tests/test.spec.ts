@@ -1,5 +1,5 @@
 import { test, request } from "@playwright/test";
-import { CRUD } from "../../apiClient";
+import { CRUD } from "../apiClient";
 import { randomUser } from "../utils/library";
 
 test("Simple CRUD flow", async () => {
