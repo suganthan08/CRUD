@@ -1,12 +1,20 @@
-// schema/createschema.ts
-export const createUserSchema = {
+import { JSONSchemaType } from "ajv";
+
+export interface CreateUserResponse {
+  id: number;
+  name: string;
+  domain: string;
+  _id: string;
+}
+
+export const createUserSchema: JSONSchemaType<CreateUserResponse> = {
   type: "object",
   properties: {
-    _id: { type: "string", pattern: "^[a-fA-F0-9]{24}$" }, // Mongo-like _id
-    id: { type: "number" },
+    id: { type: "integer" },
     name: { type: "string" },
     domain: { type: "string" },
+    _id: { type: "string" },
   },
-  required: ["_id", "id", "name", "domain"],
+  required: ["id", "name", "domain", "_id"],
   additionalProperties: false,
 };

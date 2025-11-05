@@ -1,33 +1,34 @@
-// tests/schema.spec.ts
-import { test, expect } from "@playwright/test";
+import { test, request } from "@playwright/test";
+import { CRUD } from "../apiClient";
+import { randomUser } from "../utils/library";
 import { validateSchema } from "../utils/validateschema";
 import { createUserSchema } from "../schema/createschema";
 import { updateUserSchema } from "../schema/updateschema";
-import { faker } from "@faker-js/faker";
 
-test.describe("🔍 Schema Validation Tests", () => {
-  test("✅ Create User schema validation (faker data)", async () => {
-    // 🔹 Fake user data
-    const createdUser = {
-      id: faker.number.int({ min: 1, max: 999 }),
-      name: faker.person.firstName(),
-      domain: faker.person.jobTitle(),
-      _id: faker.string.alphanumeric(24), // simulate MongoDB _id
-    };
+test.describe("Schema validation for API responses", () => {
+  let crud: CRUD;
+  let createdUser: any;
 
-    const valide = validateSchema(createUserSchema, createdUser, "Create User");
-    expect(valide).toBeTruthy();
-  
+  test.beforeAll(async () => {
+    const context = await request.newContext();
+    crud = new CRUD(context);
+  });
 
+  test("✅ Create user response should match schema", async () => {
+    const newUser = randomUser();
+    createdUser = await crud.createUser(newUser);
 
-    const updatedUser = {
-      _id: faker.string.alphanumeric(24),
-      id: faker.number.int({ min: 1, max: 999 }),
-      name: faker.person.firstName(),
-      domain: faker.person.jobTitle(),
-    };
+    const valid = validateSchema(createUserSchema, createdUser);
+    if (!valid) throw new Error("Create user response failed schema validation");
+  });
 
-    const valid = validateSchema(updateUserSchema, updatedUser, "Update User");
-    expect(valid).toBeTruthy();
+  test("✅ Update user response should match schema", async () => {
+    const updatedUser = await crud.updateUser(createdUser._id);
+
+    // Note: if your update method in CRUD doesn't return body, you can fetch after update
+    const fetchedUser = await crud.getUser(createdUser._id);
+
+    const valid = validateSchema(updateUserSchema, fetchedUser);
+    if (!valid) throw new Error("Update user response failed schema validation");
   });
 });

@@ -1,17 +1,16 @@
-// utils/validschema.ts
-import Ajv from "ajv";
+import Ajv, { JSONSchemaType } from "ajv";
+
 const ajv = new Ajv({ allErrors: true });
 
-export function validateSchema(schema: object, data: any, operation: string) {
+export function validateSchema<T>(schema: JSONSchemaType<T>, data: any): boolean {
   const validate = ajv.compile(schema);
   const valid = validate(data);
 
-  if (valid) {
-    console.log(`✅ ${operation} schema validation successful`);
-  } else {
-    console.error(`❌ ${operation} schema validation failed:`);
-    console.error(validate.errors);
+  if (!valid) {
+    console.error("❌ Schema validation errors:", validate.errors);
+    return false;
   }
 
-  return valid;
+  console.log("✅ Schema validated successfully");
+  return true;
 }
